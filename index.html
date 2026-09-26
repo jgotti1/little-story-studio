@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport"
+       content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color"
+       content="#f2f7f5" />
+  <title>Little Story Studio</title>
+  <link rel="stylesheet"
+       href="src/styles.css" />
+  <script src="src/app.js"
+       defer></script>
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand"
+           id="home-nav"
+           href="#home"
+           aria-label="Little Story Studio home">
+        <span class="brand-mark"
+             aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="brand-name">little story <b>studio</b></span>
+      </a>
+      <nav class="topbar-nav"
+           aria-label="Your creations">
+        <button class="gallery-nav"
+             id="videos-nav"
+             type="button"><span aria-hidden="true">▶</span> My videos</button>
+        <button class="gallery-nav"
+             id="gallery-nav"
+             type="button">
+          <span aria-hidden="true">▧</span> My characters <span class="count-badge"
+               id="character-count">0</span>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="view home-view"
+           id="home-view"
+           aria-labelledby="home-title">
+        <div class="home-hero">
+          <div class="hero-copy">
+            <p class="eyebrow">DRAW IT. DREAM IT. TELL IT. <span aria-hidden="true">✦</span></p>
+            <h1 id="home-title">Little Story Studio</h1>
+            <p class="hero-description">Make a character, give them a big adventure, and turn your ideas into a story that moves.</p>
+            <div class="hero-actions">
+              <button class="start-button"
+                   id="start-game"
+                   type="button"><span aria-hidden="true">✦</span> Start a new game</button>
+              <button class="videos-button"
+                   id="home-videos"
+                   type="button"><span aria-hidden="true">▶</span> My videos</button>
+            </div>
+            <p class="home-private"><span aria-hidden="true">●</span> Your creations stay on this device</p>
+          </div>
+          <div class="hero-art"
+               aria-label="A friendly story character ready for an adventure">
+            <div class="art-caption"><span>STORY NO. 01</span><span class="caption-star"
+                   aria-hidden="true">✦</span></div>
+            <svg class="hero-character"
+                 viewBox="0 0 600 420"
+                 role="img"
+                 aria-labelledby="hero-art-title">
+              <title id="hero-art-title">A hand-drawn character exploring a bright new world</title>
+              <path class="art-sun"
+                   d="M453 55c54 0 93 40 93 92 0 44-29 76-73 84-50 9-92-25-92-73 0-54 28-103 72-103Z" />
+              <path class="art-hill hill-back"
+                   d="M30 326c70-60 132-64 212-17 62 36 118 23 181-15 54-32 96-28 147 13v87H30Z" />
+              <path class="art-hill hill-front"
+                   d="M30 357c79-35 140-24 205 3 70 30 125 19 194-8 53-21 99-17 141 1v58H30Z" />
+              <path class="art-path"
+                   d="M268 418c3-47 24-80 58-103 35 24 54 57 59 103Z" />
+              <path class="art-trail"
+                   d="M120 303c24-12 37-11 54-1m-37 29c22-11 35-9 50 1m259-30c21-10 35-9 50 1" />
+              <path class="character-shadow"
+                   d="M199 353c17-13 47-19 79-18 34 1 60 9 75 21-23 12-119 17-154-3Z" />
+              <path class="character-leg"
+                   d="m236 295-5 47m61-48 12 49" />
+              <path class="character-boot"
+                   d="M218 337c12 1 20 5 25 13l-4 8-35-2c-4-6 1-14 14-19Zm71 8c10-6 20-6 30-1l13 15c-12 6-28 3-42-2Z" />
+              <path class="character-arm"
+                   d="M209 240c-24-8-45-1-52 15-5 12 4 23 17 21l32-13m111-27c23-10 43-7 55 8 10 13 2 25-11 25l-35-11" />
+              <path class="character-body"
+                   d="M217 185c18-29 75-34 100-6 16 17 20 54 14 91-4 25-17 36-54 36-39 0-63-11-69-37-8-34-7-67 9-84Z" />
+              <path class="character-belly"
+                   d="M231 250c18-17 50-17 69 0 7 7 11 21 8 34-18 13-57 12-78-1-5-12-4-24 1-33Z" />
+              <path class="character-eye"
+                   d="M244 220a7 9 0 1 0 0 .1m44-1a7 9 0 1 0 0 .1" />
+              <path class="character-smile"
+                   d="M253 238c9 10 21 10 30 0" />
+              <path class="character-antenna"
+                   d="M266 180c-2-21 6-32 22-38" />
+              <circle class="antenna-tip"
+                   cx="293"
+                   cy="139"
+                   r="8" />
+              <path class="pack-strap"
+                   d="M310 204c12 18 16 42 14 69" />
+              <rect class="character-pack"
+                   x="323"
+                   y="236"
+                   width="25"
+                   height="38"
+                   rx="10"
+                   transform="rotate(-8 323 236)" />
+              <path class="pack-pocket"
+                   d="m330 252 12-2m-8 9 8-1" />
+              <path class="art-spark"
+                   d="m111 122 5 13 13 5-13 5-5 13-5-13-13-5 13-5Zm373 167 4 10 10 4-10 4-4 10-4-10-10-4 10-4Z" />
+              <circle class="art-dot"
+                   cx="169"
+                   cy="170"
+                   r="4" />
+              <circle class="art-dot"
+                   cx="421"
+                   cy="127"
+                   r="5" />
+            </svg>
+            <div class="art-note"><span class="note-pin"
+                   aria-hidden="true">✦</span><span>Meet Pip<br /><b>Future explorer</b></span></div>
+          </div>
+        </div>
+        <section class="how-it-works"
+             aria-label="How to make a story">
+          <div class="step-item"><span class="step-number">01</span><span><b>Draw a character</b><small>Start with a doodle</small></span></div>
+          <span class="step-arrow"
+               aria-hidden="true">→</span>
+          <div class="step-item"><span class="step-number step-number-mint">02</span><span><b>Make it your own</b><small>Add a look and a motion</small></span></div>
+          <span class="step-arrow"
+               aria-hidden="true">→</span>
+          <div class="step-item"><span class="step-number step-number-yellow">03</span><span><b>Tell an adventure</b><small>Play your story in the studio</small></span></div>
+        </section>
+      </section>
+
+      <section class="view create-view is-hidden"
+           id="create-view"
+           aria-labelledby="page-title"
+           hidden>
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">YOUR CREATIVE CORNER <span aria-hidden="true">✦</span></p>
+            <h1 id="page-title">Make a character</h1>
+          </div>
+          <button class="new-button"
+               id="new-character"
+               type="button"><span aria-hidden="true">+</span> New drawing</button>
+        </div>
+
+        <div class="studio-layout">
+          <aside class="tool-panel"
+               aria-label="Drawing tools">
+            <div class="tool-group">
+              <h2>TOOLS</h2>
+              <div class="tool-toggle"
+                   role="group"
+                   aria-label="Choose a drawing tool">
+                <button class="tool-button is-selected"
+                     id="draw-tool"
+                     type="button"
+                     aria-pressed="true">
+                  <span class="tool-icon"
+                       aria-hidden="true">✎</span><span>Draw</span>
+                </button>
+                <button class="tool-button"
+                     id="erase-tool"
+                     type="button"
+                     aria-pressed="false">
+                  <span class="tool-icon eraser-icon"
+                       aria-hidden="true">▰</span><span>Eraser</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="tool-group color-group">
+              <div class="group-heading">
+                <h2>COLOR</h2><span id="color-name">Berry</span>
+              </div>
+              <div class="swatches"
+                   role="group"
+                   aria-label="Choose a color">
+                <button class="swatch is-selected"
+                     type="button"
+                     data-color="#e9584e"
+                     data-name="Berry"
+                     aria-label="Berry red"
+                     aria-pressed="true"></button>
+                <button class="swatch"
+                     type="button"
+                     data-color="#f2a43a"
+                     data-name="Sunshine"
+                     aria-label="Sunshine orange"
+                     aria-pressed="false"></button>
+                <button class="swatch"
+                     type="button"
+                     data-color="#edcf4a"
+                     data-name="Lemon"
+                     aria-label="Lemon yellow"
+                     aria-pressed="false"></button>
+                <button class="swatch"
+                     type="button"
+                     data-color="#4f9c6c"
+                     data-name="Leaf"
+                     aria-label="Leaf green"
+                     aria-pressed="false"></button>
+                <button class="swatch"
+                     type="button"
+                     data-color="#48a8b8"
+                     data-name="Lagoon"
+                     aria-label="Lagoon blue"
+                     aria-pressed="false"></button>
+                <button class="swatch"
+                     type="button"
+                     data-color="#5269a9"
+                     data-name="Blueberry"
+                     aria-label="Blueberry blue"
+                     aria-pressed="false"></button>
+                <button class="swatch"
+                     type="button"
+                     data-color="#303943"
+                     data-name="Ink"
+                     aria-label="Ink gray"
+                     aria-pressed="false"></button>
+                <button class="swatch"
+                     type="button"
+                     data-color="#bd7657"
+                     data-name="Cookie"
+                     aria-label="Cookie brown"
+                     aria-pressed="false"></button>
+              </div>
+            </div>
+
+            <div class="tool-group size-group">
+              <div class="group-heading">
+                <h2>BRUSH SIZE</h2><span id="size-value">8</span>
+              </div>
+              <input id="brush-size"
+                   type="range"
+                   min="3"
+                   max="30"
+                   value="8"
+                   aria-label="Brush size" />
+              <div class="range-labels"><span>Small</span><span>Big</span></div>
+            </div>
+
+            <div class="tool-actions">
+              <button class="quiet-button"
+                   id="undo-button"
+                   type="button"
+                   disabled><span aria-hidden="true">↶</span> Undo</button>
+              <button class="quiet-button"
+                   id="redo-button"
+                   type="button"
+                   disabled><span aria-hidden="true">↷</span> Redo</button>
+              <button class="quiet-button clear-button"
+                   id="clear-button"
+                   type="button"><span aria-hidden="true">×</span> Clear canvas</button>
+            </div>
+          </aside>
+
+          <section class="drawing-area"
+               aria-label="Character drawing canvas">
+            <div class="canvas-topline">
+              <span class="canvas-label"><span class="live-dot"></span> DRAWING TABLE</span>
+              <span class="canvas-hint">Use your finger, stylus, or mouse</span>
+            </div>
+            <div class="canvas-wrap">
+              <canvas id="drawing-canvas"
+                   width="1200"
+                   height="760"
+                   aria-label="Draw your character here"></canvas>
+              <div class="canvas-empty"
+                   id="canvas-empty"
+                   aria-hidden="true">
+                <span class="empty-sparkle">✳</span>
+                <span>Your character starts here</span>
+              </div>
+            </div>
+            <div class="canvas-bottomline">
+              <span>Make it silly. Make it yours.</span>
+              <button class="save-button"
+                   id="save-button"
+                   type="button"><span aria-hidden="true">♥</span> Save character</button>
+            </div>
+          </section>
+        </div>
+
+        <p class="privacy-note"><span aria-hidden="true">●</span> Your drawings stay on this device.</p>
+      </section>
+
+      <section class="view stage-view is-hidden"
+           id="stage-view"
+           aria-labelledby="stage-title"
+           hidden>
+        <div class="page-heading stage-heading">
+          <div>
+            <p class="eyebrow">CHARACTER STAGE <span aria-hidden="true">✦</span></p>
+            <h1 id="stage-title">Bring it to life</h1>
+          </div>
+          <button class="new-button"
+               id="stage-back-button"
+               type="button"><span aria-hidden="true">←</span> Back to drawing</button>
+        </div>
+
+        <div class="stage-layout">
+          <div class="stage-scene-panel">
+            <div class="stage-scene"
+                 id="stage-scene"
+                 data-background="sunset"
+                 aria-live="polite">
+              <div class="stage-sky"
+                   aria-hidden="true"></div>
+              <div class="stage-ground"
+                   aria-hidden="true"></div>
+              <img id="stage-character"
+                   alt="Your created character" />
+            </div>
+          </div>
+
+          <aside class="stage-sidebar"
+               aria-label="Background and motion choices">
+            <div class="stage-card">
+              <h2>Choose a background</h2>
+              <div class="background-picker"
+                   role="group"
+                   aria-label="Choose a background scene">
+                <button class="background-button is-selected"
+                     type="button"
+                     data-background="sunset"
+                     aria-pressed="true">Sunset</button>
+                <button class="background-button"
+                     type="button"
+                     data-background="meadow"
+                     aria-pressed="false">Meadow</button>
+                <button class="background-button"
+                     type="button"
+                     data-background="forest"
+                     aria-pressed="false">Forest</button>
+                <button class="background-button"
+                     type="button"
+                     data-background="beach"
+                     aria-pressed="false">Beach</button>
+                <button class="background-button"
+                     type="button"
+                     data-background="night"
+                     aria-pressed="false">Night sky</button>
+                <button class="background-button"
+                     type="button"
+                     data-background="city"
+                     aria-pressed="false">City</button>
+                <button class="background-button"
+                     type="button"
+                     data-background="castle"
+                     aria-pressed="false">Castle</button>
+                <button class="background-button"
+                     type="button"
+                     data-background="arctic"
+                     aria-pressed="false">Arctic</button>
+              </div>
+            </div>
+
+            <div class="stage-card">
+              <h2>Choose a motion</h2>
+              <div class="motion-picker"
+                   role="group"
+                   aria-label="Choose a motion">
+                <button class="motion-button is-selected"
+                     type="button"
+                     data-motion="wiggle"
+                     aria-pressed="true">Wiggle</button>
+                <button class="motion-button"
+                     type="button"
+                     data-motion="bounce"
+                     aria-pressed="false">Bounce</button>
+                <button class="motion-button"
+                     type="button"
+                     data-motion="twirl"
+                     aria-pressed="false">Twirl</button>
+                <button class="motion-button"
+                     type="button"
+                     data-motion="glide"
+                     aria-pressed="false">Glide</button>
+              </div>
+            </div>
+
+            <button class="save-button create-button"
+                 id="create-character-button"
+                 type="button"><span aria-hidden="true">✦</span> Create character</button>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view gallery-view is-hidden"
+           id="gallery-view"
+           aria-labelledby="gallery-title"
+           hidden>
+        <div class="page-heading gallery-heading">
+          <div>
+            <p class="eyebrow">YOUR CREATIVE CORNER <span aria-hidden="true">✦</span></p>
+            <h1 id="gallery-title">My characters</h1>
+          </div>
+          <button class="new-button"
+               id="gallery-new-character"
+               type="button"><span aria-hidden="true">+</span> New drawing</button>
+        </div>
+        <div class="gallery-grid"
+             id="gallery-grid"></div>
+        <div class="gallery-empty"
+             id="gallery-empty"
+             hidden>
+          <span aria-hidden="true">✎</span>
+          <h2>No characters yet</h2>
+          <p>Your next story starts with a drawing.</p>
+          <button class="save-button"
+               id="first-drawing"
+               type="button">Make your first character</button>
+        </div>
+        <button class="back-button"
+             id="back-to-studio"
+             type="button"><span aria-hidden="true">←</span> Back to drawing</button>
+      </section>
+
+      <section class="view videos-view is-hidden"
+           id="videos-view"
+           aria-labelledby="videos-title"
+           hidden>
+        <div class="page-heading gallery-heading">
+          <div>
+            <p class="eyebrow">YOUR CREATIVE CORNER <span aria-hidden="true">✦</span></p>
+            <h1 id="videos-title">My videos</h1>
+          </div>
+          <span class="local-label"><span aria-hidden="true">●</span> Saved in this game</span>
+        </div>
+        <div class="videos-empty"
+             id="videos-empty">
+          <div class="empty-film"
+               aria-hidden="true"><span>▶</span><i></i><i></i><i></i></div>
+          <p class="eyebrow">YOUR STORY SHELF</p>
+          <h2>Your adventures will live here</h2>
+          <p>When you finish a story, you can watch it here or open it to keep editing. Videos play only inside Little Story Studio.</p>
+          <button class="start-button"
+               id="videos-start-game"
+               type="button"><span aria-hidden="true">✦</span> Start a new game</button>
+        </div>
+        <div class="video-grid"
+             id="video-grid"
+             hidden></div>
+        <button class="back-button"
+             id="videos-home"
+             type="button"><span aria-hidden="true">←</span> Back to home</button>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="save-dialog"
+       id="save-dialog"
+       aria-labelledby="dialog-title">
+    <form method="dialog"
+         id="save-form">
+      <p class="eyebrow">A NEW FRIEND <span aria-hidden="true">✦</span></p>
+      <h2 id="dialog-title">Name your character</h2>
+      <label for="character-name">Character name</label>
+      <input id="character-name"
+           name="character-name"
+           type="text"
+           maxlength="24"
+           value="My character"
+           autocomplete="off"
+           required />
+      <div class="dialog-actions">
+        <button class="cancel-button"
+             id="cancel-save"
+             type="button">Keep drawing</button>
+        <button class="save-button"
+             id="confirm-save"
+             type="submit">Save friend</button>
+      </div>
+    </form>
+  </dialog>
+  <div class="toast"
+       id="toast"
+       role="status"
+       aria-live="polite"></div>
+</body>
+
+</html>
