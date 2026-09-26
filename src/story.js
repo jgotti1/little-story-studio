@@ -1,17 +1,17 @@
 "use strict";
 
 // "My stories" and the story builder. A story is an ordered list of scenes; each scene has a
-// place, one or two characters, a move, a caption, and optionally the child's own voice.
+// place, one or two characters (who can walk in from where they stood in the last scene),
+// pets and things, a move, a caption, and a sound effect. The story has one tune of music.
 // Stories save themselves as they are edited.
 (() => {
-  const { $, $$, THEMES, MOTIONS, STILL, DEFAULT_MOTION, DEFAULT_PLACE, MAX_SCENES, MAX_CAPTION, MAX_NARRATION } = window.LSS;
+  const { $, $$, THEMES, MOTIONS, STILL, DEFAULT_MOTION, DEFAULT_PLACE, MAX_SCENES, MAX_CAPTION } = window.LSS;
   const { EXTRA_GROUPS, EXTRA_ANIMS, MAX_EXTRAS, EXTRA_MIN, EXTRA_MAX } = window.LSS;
-  const { toast, setPressed, confirmAsk, makeButton, newId, formatTime, register, go, db, scene: painter } = window.LSS;
+  const { toast, setPressed, confirmAsk, makeButton, newId, register, go, db, scene: painter, sound } = window.LSS;
 
   const PREVIEW_W = 640;
   const PREVIEW_H = 480;
   const STORY_MOTIONS = [...MOTIONS, STILL];
-  const canRecordVoice = Boolean(navigator.mediaDevices?.getUserMedia && window.MediaRecorder);
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   const canvas = $("#story-canvas");
@@ -24,11 +24,8 @@
     index: 0,
     characters: [],
     arts: new Map(),
-    asking: false, // waiting for the browser to allow the microphone
     extraId: null, // the picked pet or thing in the current scene
     extraGroup: EXTRA_GROUPS[0].id,
-    recording: null, // { recorder, scene, startedAt }
-    listening: null, // { audio, url }
   };
   let loopId = 0;
   let loopStart = 0;
@@ -39,23 +36,41 @@
   const currentScene = () => state.story.scenes[state.index];
   const storyTitle = (story) => story.name || "My story";
 
+  // A new scene carries on from the one before it: same place, pets and things, and characters,
+  // but a single character stands on the other side, so they walk across when it starts.
   function blankScene(from) {
     return {
       id: newId(),
       place: from?.place || DEFAULT_PLACE,
       motion: from?.motion || DEFAULT_MOTION,
-      cast: from ? [...from.cast] : [],
+      cast: from ? from.cast.map((entry) => ({ id: entry.id, x: from.cast.length === 1 ? (entry.x < 0.5 ? 0.75 : 0.25) : entry.x })) : [],
+      walk: Boolean(from),
       extras: from ? from.extras.map((extra) => ({ ...extra, id: newId() })) : [],
       caption: "",
-      narration: null,
-      narrationDur: 0,
+      sound: "none",
     };
   }
 
   function newStory() {
     const now = Date.now();
-    return { id: newId(), name: "", scenes: [blankScene()], createdAt: now, updatedAt: now };
+    return { id: newId(), name: "", music: "none", scenes: [blankScene()], createdAt: now, updatedAt: now };
   }
+
+  // Stories saved by earlier versions are brought up to date when they are loaded.
+  function normalize(story) {
+    story.music = story.music || "none";
+    story.scenes.forEach((scene) => {
+      scene.extras = scene.extras || [];
+      scene.cast = scene.cast.map((entry, index, list) => (typeof entry === "string" ? { id: entry, x: list.length > 1 ? (index ? 0.7 : 0.3) : 0.5 } : entry));
+      scene.walk = Boolean(scene.walk);
+      scene.sound = scene.sound || "none";
+      delete scene.narration;
+      delete scene.narrationDur;
+    });
+    return story;
+  }
+
+  const composeAt = (story, index) => painter.compose(story.scenes[index], state.arts, story.scenes[index - 1]);
 
   // ---------- Saving ----------
 
@@ -103,7 +118,7 @@
     const frame = (now) => {
       loopId = requestAnimationFrame(frame);
       const scene = currentScene();
-      painter.draw(ctx, PREVIEW_W, PREVIEW_H, painter.compose(scene, state.arts), reducedMotion.matches ? 0.6 : (now - loopStart) / 1000);
+      painter.draw(ctx, PREVIEW_W, PREVIEW_H, composeAt(state.story, state.index), reducedMotion.matches ? 3 : (now - loopStart) / 1000);
       const picked = scene.extras.find((extra) => extra.id === state.extraId);
       if (picked) {
         ctx.save();
@@ -120,6 +135,9 @@
   function stopPreview() {
     cancelAnimationFrame(loopId);
   }
+
+  // Start the scene over, so a change (like where someone stands) can be watched from the beginning.
+  const replay = () => { loopStart = performance.now(); };
 
   // ---------- Scene strip ----------
 
@@ -138,7 +156,7 @@
       const thumb = document.createElement("canvas");
       thumb.width = 200;
       thumb.height = 150;
-      painter.draw(thumb.getContext("2d"), 200, 150, painter.compose(scene, state.arts), 0.5);
+      painter.draw(thumb.getContext("2d"), 200, 150, composeAt(state.story, index), 2.6);
 
       const number = document.createElement("span");
       number.className = "scene-num";
@@ -170,8 +188,6 @@
 
   function selectScene(index) {
     if (index === state.index) return;
-    stopRecording();
-    stopListening();
     state.index = index;
     state.extraId = null;
     renderStrip();
@@ -193,7 +209,7 @@
     const scenes = state.story.scenes;
     if (scenes.length >= MAX_SCENES) return;
     const scene = currentScene();
-    scenes.splice(state.index + 1, 0, { ...scene, id: newId(), cast: [...scene.cast], extras: scene.extras.map((extra) => ({ ...extra, id: newId() })) });
+    scenes.splice(state.index + 1, 0, { ...scene, id: newId(), cast: scene.cast.map((entry) => ({ ...entry })), extras: scene.extras.map((extra) => ({ ...extra, id: newId() })) });
     state.index += 1;
     changed();
     renderStrip();
@@ -215,7 +231,7 @@
   async function removeScene() {
     const scene = currentScene();
     if (state.story.scenes.length < 2) return;
-    if (scene.cast.length || scene.extras.length || scene.caption || scene.narration) {
+    if (scene.cast.length || scene.extras.length || scene.caption) {
       const ok = await confirmAsk({
         emoji: "🗑",
         title: `Remove scene ${state.index + 1}?`,
@@ -225,8 +241,6 @@
       });
       if (!ok) return;
     }
-    stopRecording();
-    stopListening();
     state.story.scenes.splice(state.index, 1);
     state.index = Math.min(state.index, state.story.scenes.length - 1);
     changed();
@@ -301,7 +315,7 @@
 
   function toggleCharacter(character) {
     const scene = currentScene();
-    const at = scene.cast.indexOf(character.id);
+    const at = scene.cast.findIndex((entry) => entry.id === character.id);
     if (at >= 0) {
       scene.cast.splice(at, 1);
     } else if (scene.cast.length >= 2) {
@@ -310,7 +324,11 @@
     } else {
       // The first character in a scene brings their favorite move along.
       if (!scene.cast.length) scene.motion = character.motion || scene.motion;
-      scene.cast.push(character.id);
+      scene.cast.push({ id: character.id, x: 0.5 });
+      if (scene.cast.length === 2) {
+        scene.cast[0].x = 0.3;
+        scene.cast[1].x = 0.7;
+      }
     }
     changed();
     renderPanels();
@@ -324,15 +342,18 @@
     setPressed($$("#story-places .option"), (item) => item.dataset.place === scene.place);
     setPressed($$("#story-motions .option"), (item) => item.dataset.motion === scene.motion);
     $$("#pick-chars .pick").forEach((button) => {
-      const at = scene.cast.indexOf(button.dataset.id);
+      const at = scene.cast.findIndex((entry) => entry.id === button.dataset.id);
       button.setAttribute("aria-pressed", String(at >= 0));
       button.classList.toggle("is-on", at >= 0);
       if (at >= 0) button.dataset.order = at + 1;
       else delete button.dataset.order;
     });
     $("#story-canvas-hint").hidden = scene.cast.length > 0 || scene.extras.length > 0;
+    renderCast();
     renderExtras();
-    renderVoice();
+    renderMusic();
+    renderSound();
+    replay();
   }
 
   captionInput.addEventListener("input", () => {
@@ -514,133 +535,97 @@
     }
   });
 
-  // ---------- Voice ----------
+  // ---------- Where characters stand, and walking ----------
 
-  let recordingTimer = 0;
-  let recordingLimit = 0;
-
-  function renderVoice() {
-    $("#voice-unsupported").hidden = canRecordVoice;
-    $("#voice-controls").hidden = !canRecordVoice;
-    if (!canRecordVoice) return;
-
+  function renderCast() {
     const scene = currentScene();
-    const recording = state.recording && state.recording.scene === scene;
-    const record = $("#voice-record");
-    record.classList.toggle("is-recording", Boolean(recording));
-    record.disabled = state.asking || (Boolean(state.recording) && !recording);
-    if (state.asking) {
-      record.textContent = "🎤 Asking to use the microphone…";
-    } else if (recording) {
-      const seconds = (performance.now() - state.recording.startedAt) / 1000;
-      record.textContent = `⏹ Stop (${formatTime(seconds)})`;
-    } else {
-      record.textContent = scene.narration ? "🎤 Record again" : "🎤 Record my voice";
-    }
-    $("#voice-listen").hidden = !scene.narration || Boolean(recording);
-    $("#voice-listen").textContent = state.listening ? "⏹ Stop" : "▶ Listen";
-    $("#voice-remove").hidden = !scene.narration || Boolean(recording);
-    $("#voice-note").textContent = recording
-      ? `Talking… it stops by itself after ${MAX_NARRATION} seconds.`
-      : scene.narration
-        ? `Your voice is in this scene (${formatTime(scene.narrationDur)}).`
-        : "Optional. Tell what is happening in this scene.";
+    const box = $("#cast-spots");
+    box.replaceChildren();
+    scene.cast.forEach((entry) => {
+      const name = state.characters.find((character) => character.id === entry.id)?.name || "Your character";
+      const row = document.createElement("label");
+      row.className = "spot-row";
+      const label = document.createElement("span");
+      label.textContent = `${name} stands`;
+      const slider = document.createElement("input");
+      slider.type = "range";
+      slider.min = "15";
+      slider.max = "85";
+      slider.value = Math.round(entry.x * 100);
+      slider.setAttribute("aria-label", `Where ${name} stands, from the left side to the right side`);
+      slider.addEventListener("input", () => { entry.x = clamp(slider.value / 100, 0.15, 0.85); changed(); });
+      slider.addEventListener("change", replay);
+      row.append(label, slider);
+      box.append(row);
+    });
+    $("#spots").hidden = scene.cast.length === 0;
+
+    $("#walk-toggle").setAttribute("aria-pressed", String(scene.walk));
+    $("#walk-toggle").classList.toggle("is-on", scene.walk);
+    $("#walk-note").textContent = !scene.walk
+      ? "Characters are just standing there when the scene starts."
+      : state.index === 0
+        ? "Characters walk in from the side when the scene starts."
+        : "Characters walk here from where they stood in the last scene.";
   }
 
-  async function startRecording() {
-    if (state.asking) return;
-    stopListening();
-    const askedDuring = enterToken;
+  $("#walk-toggle").addEventListener("click", () => {
     const scene = currentScene();
-    let stream;
-    state.asking = true;
-    renderVoice();
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch (error) {
-      console.error("Microphone unavailable", error);
-      toast("I couldn't use the microphone. Ask a grown-up to allow it, or skip the voice.");
-      return;
-    } finally {
-      state.asking = false;
-      if (state.story) renderVoice();
-    }
-    // The child may have left the story while the browser was asking.
-    if (!state.story || enterToken !== askedDuring) {
-      stream.getTracks().forEach((track) => track.stop());
-      return;
-    }
-
-    const chunks = [];
-    const recorder = new MediaRecorder(stream);
-    const startedAt = performance.now();
-    recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
-    recorder.onstop = () => {
-      stream.getTracks().forEach((track) => track.stop());
-      clearInterval(recordingTimer);
-      clearTimeout(recordingLimit);
-      state.recording = null;
-      const seconds = (performance.now() - startedAt) / 1000;
-      if (chunks.length && seconds > 0.5) {
-        scene.narration = new Blob(chunks, { type: recorder.mimeType || chunks[0].type });
-        scene.narrationDur = Math.min(seconds, MAX_NARRATION);
-        changed();
-      }
-      if (state.story && scene === currentScene()) renderVoice();
-    };
-    recorder.start();
-    state.recording = { recorder, scene, startedAt };
-    recordingTimer = setInterval(renderVoice, 250);
-    recordingLimit = setTimeout(stopRecording, MAX_NARRATION * 1000);
-    renderVoice();
-  }
-
-  function stopRecording() {
-    if (state.recording && state.recording.recorder.state !== "inactive") state.recording.recorder.stop();
-  }
-
-  function stopListening() {
-    if (!state.listening) return;
-    state.listening.audio.pause();
-    URL.revokeObjectURL(state.listening.url);
-    state.listening = null;
-  }
-
-  function listen() {
-    if (state.listening) {
-      stopListening();
-      renderVoice();
-      return;
-    }
-    const scene = currentScene();
-    if (!scene.narration) return;
-    const url = URL.createObjectURL(scene.narration);
-    const audio = new Audio(url);
-    audio.addEventListener("ended", () => { stopListening(); renderVoice(); });
-    state.listening = { audio, url };
-    audio.play().catch(() => {
-      stopListening();
-      toast("This browser wouldn't play that recording.");
-    }).finally(renderVoice);
-    renderVoice();
-  }
-
-  $("#voice-record").addEventListener("click", () => (state.recording ? stopRecording() : startRecording()));
-  $("#voice-listen").addEventListener("click", listen);
-  $("#voice-remove").addEventListener("click", () => {
-    stopListening();
-    const scene = currentScene();
-    scene.narration = null;
-    scene.narrationDur = 0;
+    scene.walk = !scene.walk;
     changed();
-    renderVoice();
+    renderCast();
+    replay();
   });
+
+  // ---------- Music and sound ----------
+
+  function buildSoundPickers() {
+    const music = $("#music-options");
+    [{ id: "none", label: "No music", icon: "🔇" }, ...sound.TRACKS].forEach((track) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "chip";
+      button.dataset.music = track.id;
+      button.textContent = `${track.icon} ${track.label}`;
+      button.addEventListener("click", () => {
+        state.story.music = track.id;
+        changed();
+        renderMusic();
+        if (track.id === "none") sound.preview.stop();
+        else sound.preview.music(track.id);
+      });
+      music.append(button);
+    });
+
+    const effects = $("#sound-options");
+    [{ id: "none", label: "No sound", icon: "🔇" }, ...sound.EFFECTS].forEach((effect) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "option";
+      button.dataset.sound = effect.id;
+      button.innerHTML = `<span class="o-icon" aria-hidden="true">${effect.icon}</span><span>${effect.label}</span>`;
+      button.addEventListener("click", () => {
+        currentScene().sound = effect.id;
+        changed();
+        renderSound();
+        if (effect.id !== "none") sound.preview.effect(effect.id);
+      });
+      effects.append(button);
+    });
+  }
+
+  function renderMusic() {
+    setPressed($$("#music-options .chip"), (item) => item.dataset.music === state.story.music);
+  }
+
+  function renderSound() {
+    setPressed($$("#sound-options .option"), (item) => item.dataset.sound === currentScene().sound);
+  }
 
   // ---------- Screens ----------
 
   function openStory(story) {
-    story.scenes.forEach((scene) => { scene.extras = scene.extras || []; }); // stories made before pets and things
-    state.story = story;
+    state.story = normalize(story);
     state.index = 0;
     go("story");
   }
@@ -662,8 +647,7 @@
 
     // Characters deleted since this story was made just leave their scenes.
     state.story.scenes.forEach((scene) => {
-      scene.cast = scene.cast.filter((id) => state.arts.has(id));
-      scene.extras = scene.extras || []; // stories made before pets and things were added
+      scene.cast = scene.cast.filter((entry) => state.arts.has(entry.id));
     });
     state.extraId = null;
     buildCharacterPicker();
@@ -675,8 +659,7 @@
   function leaveEditor() {
     enterToken += 1;
     stopPreview();
-    stopRecording();
-    stopListening();
+    sound.preview.stop();
     clearTimeout(stripTimer);
     persist();
   }
@@ -720,6 +703,7 @@
     empty.hidden = stories.length > 0;
 
     stories.forEach((story) => {
+      normalize(story);
       const item = document.createElement("li");
       const card = document.createElement("article");
       card.className = "char-card card";
@@ -731,8 +715,8 @@
       thumb.height = 300;
       thumb.setAttribute("role", "img");
       thumb.setAttribute("aria-label", `First scene of ${storyTitle(story)}`);
-      const first = story.scenes.find((scene) => scene.cast.some((id) => arts.has(id))) || story.scenes[0];
-      painter.draw(thumb.getContext("2d"), 400, 300, painter.compose(first, arts), 0.5);
+      const firstAt = Math.max(0, story.scenes.findIndex((scene) => scene.cast.some((entry) => arts.has(entry.id))));
+      painter.draw(thumb.getContext("2d"), 400, 300, painter.compose(story.scenes[firstAt], arts, story.scenes[firstAt - 1]), 2.6);
       art.append(thumb);
 
       const name = document.createElement("h2");
@@ -784,5 +768,6 @@
 
   buildPickers();
   buildExtraPalette();
-  window.LSS.story = { open: openStory, current: () => state.story };
+  buildSoundPickers();
+  window.LSS.story = { open: openStory, current: () => state.story, normalize };
 })();

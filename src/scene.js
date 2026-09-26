@@ -47,6 +47,16 @@
   };
   const motionAt = (id, t) => (MOTION_AT[id] || MOTION_AT.still)(t);
 
+  // Walking rocks side to side with a little hop on each step. `amount` fades it out on arrival.
+  const walkAt = (t, amount) => ({
+    ...REST,
+    y: -0.035 * Math.abs(Math.sin(TAU * t * 1.6)) * amount,
+    rot: deg(5) * Math.sin(TAU * t * 1.6) * amount,
+  });
+
+  // How long a walk from one spot to another takes (positions are fractions of the scene's width).
+  const walkSeconds = (from, to) => Math.min(2.4, 0.7 + Math.abs(to - from) * 2.2);
+
   // ---------- Pets and things ----------
   // Where a pet or object is at time t: x and y as a fraction of its size, rotation in radians,
   // and how much it squashes. "Sway" and "hop" pivot from the ground, the rest from the middle.
@@ -229,10 +239,20 @@
       if (!member) return;
       const slot = slots[index];
       const boxW = slot.boxW * W;
+      const spot = member.x ?? slot.cx;
       const room = top ? Math.min(slot.boxH * H, (baseY - top - 0.03 * H) / 1.25) : slot.boxH * H;
       const { w, h } = fit(member.ar, boxW, room);
-      const move = motionAt(motion, t + index * 0.35);
-      const cx = slot.cx * W + move.x * w;
+      let move = motionAt(motion, t + index * 0.35);
+      let standAt = spot;
+      // Walk in from where this character stood in the last scene (or from the edge of the picture).
+      if (member.fromX != null && Math.abs(spot - member.fromX) > 0.02) {
+        const seconds = walkSeconds(member.fromX, spot);
+        if (t < seconds) {
+          standAt = member.fromX + (spot - member.fromX) * ease(t / seconds);
+          move = walkAt(t, Math.min(1, (seconds - t) / 0.25));
+        }
+      }
+      const cx = standAt * W + move.x * w;
 
       ctx.fillStyle = "rgba(42, 34, 80, 0.28)";
       ctx.beginPath();
@@ -443,21 +463,26 @@
     return arts;
   }
 
-  // A story scene (which names its characters by id) -> a scene the painter can draw.
-  function compose(sceneData, arts) {
-    return {
-      place: sceneData.place,
-      motion: sceneData.motion,
-      caption: sceneData.caption,
-      extras: sceneData.extras || [],
-      cast: sceneData.cast.map((id) => arts.get(id)).filter(Boolean),
-    };
+  // A story scene (whose characters are { id, x }) -> a scene the painter can draw. `before` is
+  // the scene just ahead of it, so characters can walk in from where they stood.
+  function compose(sceneData, arts, before) {
+    const cast = [];
+    sceneData.cast.forEach((entry) => {
+      const art = arts.get(entry.id);
+      if (!art) return;
+      const member = { ...art, x: entry.x };
+      if (sceneData.walk) {
+        const stood = before?.cast.find((other) => other.id === entry.id);
+        member.fromX = stood ? stood.x : entry.x < 0.5 ? -0.25 : 1.25;
+      }
+      cast.push(member);
+    });
+    return { place: sceneData.place, motion: sceneData.motion, caption: sceneData.caption, extras: sceneData.extras || [], cast };
   }
 
-  // How long a scene stays on screen: long enough to read the caption or hear the voice.
+  // How long a scene stays on screen: long enough to read the caption and see any walking.
   function sceneSeconds(sceneData) {
-    const reading = Math.min(12, Math.max(4, 2 + (sceneData.caption || "").length * 0.07));
-    return sceneData.narration ? Math.max(reading, (sceneData.narrationDur || 0) + 0.8) : reading;
+    return Math.min(12, Math.max(4, 2 + (sceneData.caption || "").length * 0.07));
   }
 
   window.LSS.scene = {

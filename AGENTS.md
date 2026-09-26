@@ -34,9 +34,10 @@ Saved characters and finished videos belong to the current browser on the curren
 ### Phase 4: Build a Story
 
 - [x] Create a short, ordered sequence of scenes with backgrounds, characters, and simple actions.
-- [x] Support captions and optional narration (the child's own recorded voice).
+- [x] Support captions, background music per story, and a sound effect per scene (synthesized in the browser; no audio files, no microphone).
 - [x] Make the scene sequence easy to rearrange and preview.
 - [x] Add animated pets and objects to scenes (drag to place, resize, pick an animation), more places, and up to 20 scenes per story.
+- [x] Characters can be placed in a scene and walk in from where they stood in the previous scene.
 
 ### Phase 5: My Videos
 
@@ -48,7 +49,7 @@ Saved characters and finished videos belong to the current browser on the curren
 ## Project Conventions
 
 - Keep the first version dependency-free: static HTML, CSS, and JavaScript.
-- Put app code under `src/`; keep `index.html` at the project root. Plain scripts share one `window.LSS` object and load in the order listed in `index.html`: `data`, `db`, `ui`, `scene`, then one file per screen (`draw`, `dress`, `gallery`, `story`, `play`, `videos`), then `app`.
+- Put app code under `src/`; keep `index.html` at the project root. Plain scripts share one `window.LSS` object and load in the order listed in `index.html`: `data`, `db`, `ui`, `scene`, `audio`, then one file per screen (`draw`, `dress`, `gallery`, `story`, `play`, `videos`), then `app`.
 - Use browser-native APIs and pointer events for mouse, stylus, and touch input.
 - Store larger local assets in IndexedDB, not `localStorage`.
 - Keep controls readable, large, and direct for early readers; use words as well as icons.

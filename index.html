@@ -11,6 +11,7 @@
   <script src="src/db.js" defer></script>
   <script src="src/ui.js" defer></script>
   <script src="src/scene.js" defer></script>
+  <script src="src/audio.js" defer></script>
   <script src="src/draw.js" defer></script>
   <script src="src/dress.js" defer></script>
   <script src="src/gallery.js" defer></script>
@@ -331,6 +332,11 @@
         <p class="tip" id="story-status" role="status">Pick a character to begin</p>
       </div>
 
+      <div class="music-row">
+        <h2 class="mini-title">Music for the whole story</h2>
+        <div class="chip-row" id="music-options" role="group" aria-label="Choose music for the whole story"></div>
+      </div>
+
       <div class="story-layout">
         <div class="story-main">
           <div class="preview card">
@@ -351,6 +357,11 @@
             <h2>Who is in this scene?</h2>
             <div class="pick-grid" id="pick-chars" role="group" aria-label="Choose up to 2 characters"></div>
             <p class="tip" id="pick-empty" hidden>You need a character first. <a href="#draw">Draw one!</a></p>
+            <div class="spots" id="spots" hidden>
+              <div id="cast-spots"></div>
+              <button class="btn small ghost walk-toggle" type="button" id="walk-toggle" aria-pressed="true"><span aria-hidden="true">🚶</span> Walk in</button>
+              <p class="tip" id="walk-note" aria-live="polite"></p>
+            </div>
           </div>
           <div class="tray-section">
             <h2>Add pets and things</h2>
@@ -380,14 +391,9 @@
             <div class="option-grid" id="story-motions" role="group" aria-label="Choose an action"></div>
           </div>
           <div class="tray-section">
-            <h2>Your voice</h2>
-            <div class="voice-row" id="voice-controls">
-              <button class="btn small ghost" type="button" id="voice-record">🎤 Record my voice</button>
-              <button class="btn small ghost" type="button" id="voice-listen" hidden>▶ Listen</button>
-              <button class="btn small danger" type="button" id="voice-remove" hidden>🗑 Remove voice</button>
-            </div>
-            <p class="tip" id="voice-note"></p>
-            <p class="tip" id="voice-unsupported" hidden>This browser can't record voices. Your words still show in the story.</p>
+            <h2>Sound effect</h2>
+            <div class="option-grid" id="sound-options" role="group" aria-label="Choose a sound for the start of this scene"></div>
+            <p class="tip sound-note">Plays when this scene starts.</p>
           </div>
         </aside>
       </div>

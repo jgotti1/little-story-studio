@@ -5,7 +5,7 @@
 // still plays. Nothing leaves the device.
 (() => {
   const { $, PLAY_W: W, PLAY_H: H, CARD_SECONDS } = window.LSS;
-  const { toast, newId, register, go, db, scene: painter } = window.LSS;
+  const { toast, newId, register, go, db, scene: painter, sound } = window.LSS;
 
   const canvas = $("#player-canvas");
   canvas.width = W;
@@ -30,7 +30,7 @@
   let total = 0;
   let t = 0;
   let mode = "loading"; // loading | ready | playing | paused | ended | recording | saving
-  let audio = null; // { ctx, dest, buffers, sources }
+  let engine = null; // the sound engine: music, effects, and what gets recorded
   let recording = null; // { recorder, chunks, stream, type }
   let audioSeg = -1;
   let rafId = 0;
@@ -44,16 +44,12 @@
 
   function buildSegments() {
     const list = [{ type: "title", dur: CARD_SECONDS }];
+    let before = null; // the scene shown just ahead, so characters can walk on from where it left them
     story.scenes.forEach((scene) => {
-      const shown = scene.cast.some((id) => arts.has(id)) || (scene.extras || []).length || scene.caption;
+      const shown = scene.cast.some((entry) => arts.has(entry.id)) || scene.extras.length || scene.caption;
       if (!shown) return;
-      const buffer = audio?.buffers.get(scene.id);
-      list.push({
-        type: "scene",
-        scene,
-        composed: painter.compose(scene, arts),
-        dur: painter.sceneSeconds({ ...scene, narrationDur: buffer ? buffer.duration : scene.narrationDur }),
-      });
+      list.push({ type: "scene", scene, composed: painter.compose(scene, arts, before), dur: painter.sceneSeconds(scene) });
+      before = scene;
     });
     list.push({ type: "end", dur: CARD_SECONDS });
 
@@ -111,7 +107,7 @@
       const segment = segmentAt(t);
       if (segment.index !== audioSeg) {
         audioSeg = segment.index;
-        if (segment.type === "scene") startVoice(segment.scene);
+        if (segment.type === "scene" && segment.scene.sound !== "none") engine?.effect(segment.scene.sound);
       }
     }
     paint();
@@ -119,48 +115,23 @@
 
   // ---------- Sound ----------
 
-  // The sound engine has to be created inside the tap that starts the story, or Safari keeps it muted.
-  function prepareAudio() {
-    const voiced = story.scenes.filter((scene) => scene.narration);
-    if (!voiced.length) return Promise.resolve();
-    const Engine = window.AudioContext || window.webkitAudioContext;
-    if (!Engine) return Promise.resolve();
-
-    if (!audio) {
-      const engine = new Engine();
-      audio = { ctx: engine, dest: engine.createMediaStreamDestination(), buffers: new Map(), sources: [] };
-    }
-    audio.ctx.resume();
-    return Promise.all(voiced.map(async (scene) => {
-      if (audio.buffers.has(scene.id)) return;
-      try {
-        audio.buffers.set(scene.id, await audio.ctx.decodeAudioData(await scene.narration.arrayBuffer()));
-      } catch (error) {
-        console.error("Could not read a recorded voice", error);
-      }
-    }));
+  // Called at the very start of a tap on Play or Save: Safari only lets sound start from inside a tap.
+  async function prepareAudio() {
+    const wanted = story.music !== "none" || story.scenes.some((scene) => scene.sound !== "none");
+    if (!wanted) return;
+    engine ||= sound.createEngine();
+    if (!engine) return;
+    engine.ready();
+    if (story.music !== "none") await engine.loadMusic(story.music);
   }
 
-  function startVoice(scene) {
-    const buffer = audio?.buffers.get(scene.id);
-    if (!buffer) return;
-    const source = audio.ctx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(audio.ctx.destination);
-    if (recording) source.connect(audio.dest);
-    source.start();
-    audio.sources.push(source);
-  }
-
-  function stopVoices() {
-    audio?.sources.forEach((source) => { try { source.stop(); } catch (error) { /* already finished */ } });
-    if (audio) audio.sources = [];
+  function startMusic() {
+    if (engine && story.music !== "none") engine.startMusic(story.music, total);
   }
 
   function closeAudio() {
-    stopVoices();
-    audio?.ctx.close().catch(() => {});
-    audio = null;
+    engine?.close();
+    engine = null;
   }
 
   // ---------- Modes and buttons ----------
@@ -209,7 +180,7 @@
     await prepareAudio();
     if (mine !== token) return;
 
-    stopVoices();
+    engine?.stopMusic();
     buildSegments();
     t = 0;
     audioSeg = -1;
@@ -220,6 +191,7 @@
       return;
     }
     if (mine !== token) return;
+    startMusic();
     setMode(record ? "recording" : "playing");
   }
 
@@ -231,25 +203,25 @@
   }
 
   function pause() {
-    audio?.ctx.suspend();
+    engine?.suspend();
     setMode("paused");
   }
 
   function resume() {
-    audio?.ctx.resume();
+    engine?.resume();
     setMode("playing");
   }
 
   function restart() {
-    stopVoices();
-    audio?.ctx.resume();
+    engine?.resume();
     t = 0;
     audioSeg = -1;
+    startMusic();
     setMode("playing");
   }
 
   function finish() {
-    stopVoices();
+    engine?.stopMusic();
     if (mode === "recording") finishRecording();
     else setMode("ended");
   }
@@ -269,7 +241,7 @@
 
     try {
       const stream = canvas.captureStream(30);
-      audio?.dest.stream.getAudioTracks().forEach((track) => stream.addTrack(track));
+      engine?.dest.stream.getAudioTracks().forEach((track) => stream.addTrack(track));
       const type = MediaRecorder.isTypeSupported ? MOVIE_TYPES.find((item) => MediaRecorder.isTypeSupported(item)) : undefined;
       const recorder = new MediaRecorder(stream, { ...(type ? { mimeType: type } : {}), videoBitsPerSecond: 2500000 });
       const chunks = [];
@@ -291,7 +263,7 @@
     current.recorder.ondataavailable = null;
     if (current.recorder.state !== "inactive") current.recorder.stop();
     current.stream.getTracks().forEach((track) => track.stop());
-    stopVoices();
+    engine?.stopMusic();
     if (message) toast(message);
     t = 0;
     audioSeg = -1;
@@ -354,7 +326,7 @@
     savedThisRun = false;
     t = 0;
     audioSeg = -1;
-    audio = null;
+    engine = null;
     arts = new Map();
     $("#watch-title").textContent = storyTitle();
     $("#watch-back-label").textContent = api.from === "story" ? "Back to editing" : "My stories";
