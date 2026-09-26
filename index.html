@@ -1,490 +1,480 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport"
-       content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color"
-       content="#f2f7f5" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#fff5e1" />
   <title>Little Story Studio</title>
-  <link rel="stylesheet"
-       href="src/styles.css" />
-  <script src="src/app.js"
-       defer></script>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='16' fill='%237c5cff' stroke='%232a2250' stroke-width='5'/%3E%3Cpath d='M32 14l5 12 13 2-10 9 3 13-11-7-11 7 3-13-10-9 13-2z' fill='%23ffd028' stroke='%232a2250' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="src/styles.css" />
+  <script src="src/data.js" defer></script>
+  <script src="src/db.js" defer></script>
+  <script src="src/ui.js" defer></script>
+  <script src="src/scene.js" defer></script>
+  <script src="src/draw.js" defer></script>
+  <script src="src/dress.js" defer></script>
+  <script src="src/gallery.js" defer></script>
+  <script src="src/story.js" defer></script>
+  <script src="src/play.js" defer></script>
+  <script src="src/videos.js" defer></script>
+  <script src="src/app.js" defer></script>
 </head>
 
 <body>
-  <div class="app-shell">
-    <header class="topbar">
-      <a class="brand"
-           id="home-nav"
-           href="#home"
-           aria-label="Little Story Studio home">
-        <span class="brand-mark"
-             aria-hidden="true"><span></span><span></span><span></span></span>
-        <span class="brand-name">little story <b>studio</b></span>
-      </a>
-      <nav class="topbar-nav"
-           aria-label="Your creations">
-        <button class="gallery-nav"
-             id="videos-nav"
-             type="button"><span aria-hidden="true">▶</span> My videos</button>
-        <button class="gallery-nav"
-             id="gallery-nav"
-             type="button">
-          <span aria-hidden="true">▧</span> My characters <span class="count-badge"
-               id="character-count">0</span>
-        </button>
-      </nav>
-    </header>
+  <a class="skip-link" href="#main">Skip to the game</a>
 
-    <main>
-      <section class="view home-view"
-           id="home-view"
-           aria-labelledby="home-title">
-        <div class="home-hero">
-          <div class="hero-copy">
-            <p class="eyebrow">DRAW IT. DREAM IT. TELL IT. <span aria-hidden="true">✦</span></p>
-            <h1 id="home-title">Little Story Studio</h1>
-            <p class="hero-description">Make a character, give them a big adventure, and turn your ideas into a story that moves.</p>
-            <div class="hero-actions">
-              <button class="start-button"
-                   id="start-game"
-                   type="button"><span aria-hidden="true">✦</span> Start a new game</button>
-              <button class="videos-button"
-                   id="home-videos"
-                   type="button"><span aria-hidden="true">▶</span> My videos</button>
-            </div>
-            <p class="home-private"><span aria-hidden="true">●</span> Your creations stay on this device</p>
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="Little Story Studio, home">
+      <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="4" y="4" width="56" height="56" rx="16" />
+        <path d="M32 14l5 12 13 2-10 9 3 13-11-7-11 7 3-13-10-9 13-2z" />
+      </svg>
+      <span class="brand-name">Little Story <b>Studio</b></span>
+    </a>
+
+    <nav class="tabs" aria-label="Main">
+      <a class="tab tab-home" href="#home" data-tab="home"><span class="tab-icon" aria-hidden="true">🏠</span><span class="tab-label">Home</span></a>
+      <a class="tab" href="#draw" data-tab="draw"><span class="tab-icon" aria-hidden="true">✏️</span><span class="tab-label">Draw</span></a>
+      <a class="tab" href="#characters" data-tab="characters"><span class="tab-icon" aria-hidden="true">🎭</span><span class="tab-label">Characters</span><span class="badge" id="count" aria-label="saved characters">0</span></a>
+      <a class="tab" href="#stories" data-tab="story"><span class="tab-icon" aria-hidden="true">📖</span><span class="tab-label">Stories</span></a>
+      <a class="tab" href="#videos" data-tab="videos"><span class="tab-icon" aria-hidden="true">🎬</span><span class="tab-label">Videos</span></a>
+    </nav>
+  </header>
+
+  <main id="main">
+
+    <!-- HOME -->
+    <section class="view home" id="view-home" data-title="Home" hidden>
+      <div class="hero">
+        <div class="hero-copy">
+          <p class="pill pill-sun">✦ Draw it. Move it. Tell it.</p>
+          <h1>Draw a friend.<br />Make a <span class="squiggle">story.</span></h1>
+          <p class="lead">Doodle your own character, make it dance around, dress it up, and star it in your very own movie.</p>
+          <div class="hero-actions">
+            <a class="btn primary big" href="#draw" id="start-game"><span aria-hidden="true">✏️</span> Start drawing</a>
+            <a class="btn ghost big" href="#videos"><span aria-hidden="true">🎬</span> My videos</a>
           </div>
-          <div class="hero-art"
-               aria-label="A friendly story character ready for an adventure">
-            <div class="art-caption"><span>STORY NO. 01</span><span class="caption-star"
-                   aria-hidden="true">✦</span></div>
-            <svg class="hero-character"
-                 viewBox="0 0 600 420"
-                 role="img"
-                 aria-labelledby="hero-art-title">
-              <title id="hero-art-title">A hand-drawn character exploring a bright new world</title>
-              <path class="art-sun"
-                   d="M453 55c54 0 93 40 93 92 0 44-29 76-73 84-50 9-92-25-92-73 0-54 28-103 72-103Z" />
-              <path class="art-hill hill-back"
-                   d="M30 326c70-60 132-64 212-17 62 36 118 23 181-15 54-32 96-28 147 13v87H30Z" />
-              <path class="art-hill hill-front"
-                   d="M30 357c79-35 140-24 205 3 70 30 125 19 194-8 53-21 99-17 141 1v58H30Z" />
-              <path class="art-path"
-                   d="M268 418c3-47 24-80 58-103 35 24 54 57 59 103Z" />
-              <path class="art-trail"
-                   d="M120 303c24-12 37-11 54-1m-37 29c22-11 35-9 50 1m259-30c21-10 35-9 50 1" />
-              <path class="character-shadow"
-                   d="M199 353c17-13 47-19 79-18 34 1 60 9 75 21-23 12-119 17-154-3Z" />
-              <path class="character-leg"
-                   d="m236 295-5 47m61-48 12 49" />
-              <path class="character-boot"
-                   d="M218 337c12 1 20 5 25 13l-4 8-35-2c-4-6 1-14 14-19Zm71 8c10-6 20-6 30-1l13 15c-12 6-28 3-42-2Z" />
-              <path class="character-arm"
-                   d="M209 240c-24-8-45-1-52 15-5 12 4 23 17 21l32-13m111-27c23-10 43-7 55 8 10 13 2 25-11 25l-35-11" />
-              <path class="character-body"
-                   d="M217 185c18-29 75-34 100-6 16 17 20 54 14 91-4 25-17 36-54 36-39 0-63-11-69-37-8-34-7-67 9-84Z" />
-              <path class="character-belly"
-                   d="M231 250c18-17 50-17 69 0 7 7 11 21 8 34-18 13-57 12-78-1-5-12-4-24 1-33Z" />
-              <path class="character-eye"
-                   d="M244 220a7 9 0 1 0 0 .1m44-1a7 9 0 1 0 0 .1" />
-              <path class="character-smile"
-                   d="M253 238c9 10 21 10 30 0" />
-              <path class="character-antenna"
-                   d="M266 180c-2-21 6-32 22-38" />
-              <circle class="antenna-tip"
-                   cx="293"
-                   cy="139"
-                   r="8" />
-              <path class="pack-strap"
-                   d="M310 204c12 18 16 42 14 69" />
-              <rect class="character-pack"
-                   x="323"
-                   y="236"
-                   width="25"
-                   height="38"
-                   rx="10"
-                   transform="rotate(-8 323 236)" />
-              <path class="pack-pocket"
-                   d="m330 252 12-2m-8 9 8-1" />
-              <path class="art-spark"
-                   d="m111 122 5 13 13 5-13 5-5 13-5-13-13-5 13-5Zm373 167 4 10 10 4-10 4-4 10-4-10-10-4 10-4Z" />
-              <circle class="art-dot"
-                   cx="169"
-                   cy="170"
-                   r="4" />
-              <circle class="art-dot"
-                   cx="421"
-                   cy="127"
-                   r="5" />
+          <p class="private-note"><span aria-hidden="true">🔒</span> Everything you make stays on this device.</p>
+        </div>
+
+        <div class="hero-art">
+          <svg viewBox="0 0 520 460" role="img" aria-labelledby="hero-title">
+            <title id="hero-title">Bloop, a friendly purple monster, standing on a hill and holding a giant orange crayon</title>
+            <defs>
+              <clipPath id="panel-clip"><rect x="58" y="48" width="404" height="354" rx="24" /></clipPath>
+            </defs>
+            <g transform="rotate(-3 260 230)">
+              <rect class="h-page" x="40" y="30" width="440" height="390" rx="36" />
+              <rect class="h-sky" x="58" y="48" width="404" height="354" rx="24" />
+              <g clip-path="url(#panel-clip)">
+                <g class="h-sun">
+                  <path d="M392 52v20M392 168v20M320 120h-20M484 120h-20M341 69l14 14M429 157l14 14M443 69l-14 14M355 157l-14 14" />
+                  <circle cx="392" cy="120" r="38" />
+                </g>
+                <g class="h-cloud"><circle cx="128" cy="112" r="20" /><circle cx="158" cy="98" r="27" /><circle cx="190" cy="114" r="20" /><rect x="108" y="112" width="102" height="22" rx="11" /></g>
+                <path class="h-hill-back" d="M40 300c80-40 170-50 250-14s150 20 200-18v150H40Z" />
+                <path class="h-hill" d="M40 340c100-46 200-52 290-22s130 12 170-8v110H40Z" />
+                <g class="h-flowers">
+                  <path d="M96 366v-24M118 378v-20M424 356v-24M446 370v-18" />
+                  <circle cx="96" cy="338" r="8" /><circle cx="118" cy="354" r="8" /><circle cx="424" cy="328" r="8" /><circle cx="446" cy="348" r="8" />
+                </g>
+              </g>
+
+              <g class="bloop">
+                <ellipse class="h-shadow" cx="250" cy="372" rx="92" ry="12" />
+                <!-- arms sit behind the body -->
+                <path class="arm-outline" d="M182 268c-32 6-42 34-26 50" />
+                <path class="arm-fill" d="M182 268c-32 6-42 34-26 50" />
+                <g class="wave">
+                  <path class="arm-outline" d="M320 262c38-16 52-52 40-86" />
+                  <path class="arm-fill" d="M320 262c38-16 52-52 40-86" />
+                  <circle class="hand" cx="360" cy="172" r="15" />
+                </g>
+                <!-- crayon -->
+                <g transform="rotate(-22 150 300)">
+                  <rect class="crayon" x="134" y="246" width="32" height="96" rx="7" />
+                  <path class="crayon-tip" d="M134 246l16-40 16 40Z" />
+                  <path class="crayon-band" d="M134 268h32M134 322h32" />
+                </g>
+                <circle class="hand" cx="156" cy="316" r="15" />
+                <!-- feet -->
+                <ellipse class="foot" cx="214" cy="356" rx="32" ry="15" />
+                <ellipse class="foot" cx="286" cy="356" rx="32" ry="15" />
+                <!-- horns -->
+                <path class="horn" d="M204 172l-16-52 42 30Z" />
+                <path class="horn" d="M296 172l16-52-42 30Z" />
+                <!-- body -->
+                <path class="body" d="M170 336c-22-96 4-186 80-186s102 90 80 186c-8 22-152 22-160 0Z" />
+                <ellipse class="belly" cx="250" cy="284" rx="50" ry="50" />
+                <g class="eyes">
+                  <circle class="eye" cx="222" cy="220" r="23" /><circle class="eye" cx="278" cy="220" r="23" />
+                  <circle class="pupil" cx="227" cy="223" r="10" /><circle class="pupil" cx="283" cy="223" r="10" />
+                  <circle class="glint" cx="231" cy="218" r="3.5" /><circle class="glint" cx="287" cy="218" r="3.5" />
+                </g>
+                <circle class="cheek" cx="196" cy="254" r="10" /><circle class="cheek" cx="304" cy="254" r="10" />
+                <path class="mouth" d="M226 260q24 30 48 0Z" />
+              </g>
+
+              <g class="h-spark">
+                <path d="M96 200l5 13 13 5-13 5-5 13-5-13-13-5 13-5Z" />
+                <path d="M430 258l4 10 10 4-10 4-4 10-4-10-10-4 10-4Z" />
+                <path d="M390 52l3 8 8 3-8 3-3 8-3-8-8-3 8-3Z" />
+              </g>
+            </g>
+          </svg>
+          <p class="hero-tag">Meet <b>Bloop</b> — drawn with love</p>
+        </div>
+      </div>
+
+      <section class="steps" aria-labelledby="steps-title">
+        <h2 id="steps-title" class="section-title">How it works</h2>
+        <ol class="step-list">
+          <li class="step step-1"><span class="step-num">1</span><span class="step-emoji" aria-hidden="true">✏️</span><h3>Draw</h3><p>Sketch a character with colors and brushes.</p></li>
+          <li class="step step-2"><span class="step-num">2</span><span class="step-emoji" aria-hidden="true">🪄</span><h3>Bring it to life</h3><p>Pick a move and watch it go!</p></li>
+          <li class="step step-3"><span class="step-num">3</span><span class="step-emoji" aria-hidden="true">👒</span><h3>Dress it up</h3><p>Hats, capes and props.</p></li>
+          <li class="step step-4"><span class="step-num">4</span><span class="step-emoji" aria-hidden="true">🎬</span><h3>Tell a story</h3><p>Scenes, captions and a movie.</p></li>
+        </ol>
+      </section>
+    </section>
+
+    <!-- DRAW -->
+    <section class="view draw" id="view-draw" data-title="Draw" hidden>
+      <div class="view-head">
+        <div>
+          <p class="pill pill-violet">Step 1 of 3</p>
+          <h1 tabindex="-1">Draw your character</h1>
+        </div>
+        <button class="btn ghost" type="button" id="new-drawing"><span aria-hidden="true">＋</span> New drawing</button>
+      </div>
+
+      <div class="draw-layout">
+        <div class="canvas-card card">
+          <div class="canvas-wrap">
+            <canvas id="canvas" aria-label="Drawing canvas. Draw with your finger, a stylus, or a mouse."></canvas>
+            <div class="canvas-hint" id="canvas-hint" aria-hidden="true">
+              <span class="hint-icon">✏️</span>
+              <strong>Draw here!</strong>
+              <span>Use your finger, a stylus, or a mouse</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="tray card" aria-label="Drawing tools">
+          <div class="tray-section tray-tools">
+            <h2>Tool</h2>
+            <div class="tool-row" role="group" aria-label="Choose a tool">
+              <button class="tool is-on" type="button" data-tool="draw" aria-pressed="true"><span aria-hidden="true">✏️</span> Draw</button>
+              <button class="tool" type="button" data-tool="erase" aria-pressed="false"><span aria-hidden="true">🧽</span> Eraser</button>
+            </div>
+          </div>
+
+          <div class="tray-section tray-history">
+            <h2>Oops!</h2>
+            <div class="history-row">
+              <button class="btn small ghost" type="button" id="undo" disabled><span aria-hidden="true">↶</span> Undo</button>
+              <button class="btn small ghost" type="button" id="redo" disabled><span aria-hidden="true">↷</span> Redo</button>
+              <button class="btn small danger" type="button" id="clear"><span aria-hidden="true">🗑</span> Clear</button>
+            </div>
+          </div>
+
+          <div class="tray-section tray-colors">
+            <h2>Color <span class="color-name" id="color-name">Grape</span></h2>
+            <div class="swatches" id="swatches" role="group" aria-label="Choose a color"></div>
+          </div>
+
+          <div class="tray-section tray-sizes">
+            <h2>Brush size</h2>
+            <div class="sizes" id="sizes" role="group" aria-label="Choose a brush size"></div>
+          </div>
+        </aside>
+
+        <div class="cta-row">
+          <p class="tip">Tip: draw just one character, all by itself.</p>
+          <button class="btn primary big" type="button" id="to-stage">Bring it to life <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE (Bring it to life, and Dress it up) -->
+    <section class="view stage-view" id="view-stage" data-title="Bring it to life" hidden>
+      <div class="view-head">
+        <div>
+          <p class="pill pill-violet" id="stage-step">Step 2 of 3</p>
+          <h1 tabindex="-1" id="stage-title">Bring it to life</h1>
+        </div>
+        <div class="head-actions">
+          <button class="btn ghost" type="button" id="stage-back"><span aria-hidden="true">←</span> <span id="stage-back-label">Back to drawing</span></button>
+          <button class="btn primary" type="button" id="stage-next">Dress it up <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+
+      <div class="stage-layout">
+        <div class="stage-col">
+          <div class="stage card" id="stage" data-mode="stage" data-motion="wiggle">
+            <svg class="scenery" viewBox="0 0 800 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+              <g class="stars">
+                <circle cx="90" cy="70" r="3" /><circle cx="210" cy="140" r="2.5" /><circle cx="330" cy="60" r="3" /><circle cx="440" cy="130" r="2" />
+                <circle cx="530" cy="50" r="2.5" /><circle cx="700" cy="180" r="3" /><circle cx="740" cy="70" r="2" /><circle cx="160" cy="250" r="2" /><circle cx="60" cy="180" r="2" />
+              </g>
+              <g class="orb"><circle class="orb-glow" r="92" /><circle class="orb-core" r="58" /></g>
+              <g class="clouds">
+                <g class="cloud cloud-a"><circle cx="0" cy="0" r="26" /><circle cx="34" cy="-14" r="34" /><circle cx="72" cy="0" r="26" /><rect x="-26" y="0" width="124" height="26" rx="13" /></g>
+                <g class="cloud cloud-b"><circle cx="0" cy="0" r="20" /><circle cx="26" cy="-11" r="26" /><circle cx="56" cy="0" r="20" /><rect x="-20" y="0" width="96" height="20" rx="10" /></g>
+              </g>
+              <path class="sea" d="M0 360h800v240H0Z" />
+              <path class="sea-foam" d="M0 372c40-10 80 10 120 0s80-10 120 0 80 10 120 0 80-10 120 0 80 10 120 0 80-10 120 0" />
+              <path class="hill hill-back" d="M0 400C120 320 260 330 380 390s240 60 420-30v240H0Z" />
+              <path class="hill hill-front" d="M0 470c160-50 300-40 430 0s260 30 370-20v150H0Z" />
             </svg>
-            <div class="art-note"><span class="note-pin"
-                   aria-hidden="true">✦</span><span>Meet Pip<br /><b>Future explorer</b></span></div>
+            <div class="actor">
+              <span class="actor-shadow" aria-hidden="true"></span>
+              <div class="rig" id="rig">
+                <img id="actor" alt="Your drawing" draggable="false" />
+                <div class="stickers" id="stickers"></div>
+              </div>
+            </div>
+            <button class="btn small ghost stage-play" type="button" id="play-toggle" aria-pressed="true"><span aria-hidden="true">⏸</span> <span id="play-label">Pause</span></button>
+          </div>
+
+          <div class="sticker-bar card" id="sticker-bar" hidden>
+            <p class="tip" id="sticker-hint" aria-live="polite"></p>
+            <div class="sticker-tools" role="group" aria-label="Change the picked sticker">
+              <button class="btn small ghost" type="button" id="st-smaller" disabled><span aria-hidden="true">➖</span> Smaller</button>
+              <button class="btn small ghost" type="button" id="st-bigger" disabled><span aria-hidden="true">➕</span> Bigger</button>
+              <button class="btn small ghost" type="button" id="st-turn" disabled><span aria-hidden="true">↻</span> Turn</button>
+              <button class="btn small danger" type="button" id="st-remove" disabled><span aria-hidden="true">🗑</span> Take off</button>
+            </div>
           </div>
         </div>
-        <section class="how-it-works"
-             aria-label="How to make a story">
-          <div class="step-item"><span class="step-number">01</span><span><b>Draw a character</b><small>Start with a doodle</small></span></div>
-          <span class="step-arrow"
-               aria-hidden="true">→</span>
-          <div class="step-item"><span class="step-number step-number-mint">02</span><span><b>Make it your own</b><small>Add a look and a motion</small></span></div>
-          <span class="step-arrow"
-               aria-hidden="true">→</span>
-          <div class="step-item"><span class="step-number step-number-yellow">03</span><span><b>Tell an adventure</b><small>Play your story in the studio</small></span></div>
-        </section>
-      </section>
 
-      <section class="view create-view is-hidden"
-           id="create-view"
-           aria-labelledby="page-title"
-           hidden>
-        <div class="page-heading">
-          <div>
-            <p class="eyebrow">YOUR CREATIVE CORNER <span aria-hidden="true">✦</span></p>
-            <h1 id="page-title">Make a character</h1>
-          </div>
-          <button class="new-button"
-               id="new-character"
-               type="button"><span aria-hidden="true">+</span> New drawing</button>
-        </div>
-
-        <div class="studio-layout">
-          <aside class="tool-panel"
-               aria-label="Drawing tools">
-            <div class="tool-group">
-              <h2>TOOLS</h2>
-              <div class="tool-toggle"
-                   role="group"
-                   aria-label="Choose a drawing tool">
-                <button class="tool-button is-selected"
-                     id="draw-tool"
-                     type="button"
-                     aria-pressed="true">
-                  <span class="tool-icon"
-                       aria-hidden="true">✎</span><span>Draw</span>
-                </button>
-                <button class="tool-button"
-                     id="erase-tool"
-                     type="button"
-                     aria-pressed="false">
-                  <span class="tool-icon eraser-icon"
-                       aria-hidden="true">▰</span><span>Eraser</span>
-                </button>
-              </div>
+        <aside class="controls card" aria-label="Character controls">
+          <div class="panel" id="panel-motion">
+            <div class="tray-section">
+              <h2>Pick a move</h2>
+              <div class="option-grid" id="motions" role="group" aria-label="Choose a move"></div>
             </div>
-
-            <div class="tool-group color-group">
-              <div class="group-heading">
-                <h2>COLOR</h2><span id="color-name">Berry</span>
-              </div>
-              <div class="swatches"
-                   role="group"
-                   aria-label="Choose a color">
-                <button class="swatch is-selected"
-                     type="button"
-                     data-color="#e9584e"
-                     data-name="Berry"
-                     aria-label="Berry red"
-                     aria-pressed="true"></button>
-                <button class="swatch"
-                     type="button"
-                     data-color="#f2a43a"
-                     data-name="Sunshine"
-                     aria-label="Sunshine orange"
-                     aria-pressed="false"></button>
-                <button class="swatch"
-                     type="button"
-                     data-color="#edcf4a"
-                     data-name="Lemon"
-                     aria-label="Lemon yellow"
-                     aria-pressed="false"></button>
-                <button class="swatch"
-                     type="button"
-                     data-color="#4f9c6c"
-                     data-name="Leaf"
-                     aria-label="Leaf green"
-                     aria-pressed="false"></button>
-                <button class="swatch"
-                     type="button"
-                     data-color="#48a8b8"
-                     data-name="Lagoon"
-                     aria-label="Lagoon blue"
-                     aria-pressed="false"></button>
-                <button class="swatch"
-                     type="button"
-                     data-color="#5269a9"
-                     data-name="Blueberry"
-                     aria-label="Blueberry blue"
-                     aria-pressed="false"></button>
-                <button class="swatch"
-                     type="button"
-                     data-color="#303943"
-                     data-name="Ink"
-                     aria-label="Ink gray"
-                     aria-pressed="false"></button>
-                <button class="swatch"
-                     type="button"
-                     data-color="#bd7657"
-                     data-name="Cookie"
-                     aria-label="Cookie brown"
-                     aria-pressed="false"></button>
-              </div>
-            </div>
-
-            <div class="tool-group size-group">
-              <div class="group-heading">
-                <h2>BRUSH SIZE</h2><span id="size-value">8</span>
-              </div>
-              <input id="brush-size"
-                   type="range"
-                   min="3"
-                   max="30"
-                   value="8"
-                   aria-label="Brush size" />
-              <div class="range-labels"><span>Small</span><span>Big</span></div>
-            </div>
-
-            <div class="tool-actions">
-              <button class="quiet-button"
-                   id="undo-button"
-                   type="button"
-                   disabled><span aria-hidden="true">↶</span> Undo</button>
-              <button class="quiet-button"
-                   id="redo-button"
-                   type="button"
-                   disabled><span aria-hidden="true">↷</span> Redo</button>
-              <button class="quiet-button clear-button"
-                   id="clear-button"
-                   type="button"><span aria-hidden="true">×</span> Clear canvas</button>
-            </div>
-          </aside>
-
-          <section class="drawing-area"
-               aria-label="Character drawing canvas">
-            <div class="canvas-topline">
-              <span class="canvas-label"><span class="live-dot"></span> DRAWING TABLE</span>
-              <span class="canvas-hint">Use your finger, stylus, or mouse</span>
-            </div>
-            <div class="canvas-wrap">
-              <canvas id="drawing-canvas"
-                   width="1200"
-                   height="760"
-                   aria-label="Draw your character here"></canvas>
-              <div class="canvas-empty"
-                   id="canvas-empty"
-                   aria-hidden="true">
-                <span class="empty-sparkle">✳</span>
-                <span>Your character starts here</span>
-              </div>
-            </div>
-            <div class="canvas-bottomline">
-              <span>Make it silly. Make it yours.</span>
-              <button class="save-button"
-                   id="save-button"
-                   type="button"><span aria-hidden="true">♥</span> Save character</button>
-            </div>
-          </section>
-        </div>
-
-        <p class="privacy-note"><span aria-hidden="true">●</span> Your drawings stay on this device.</p>
-      </section>
-
-      <section class="view stage-view is-hidden"
-           id="stage-view"
-           aria-labelledby="stage-title"
-           hidden>
-        <div class="page-heading stage-heading">
-          <div>
-            <p class="eyebrow">CHARACTER STAGE <span aria-hidden="true">✦</span></p>
-            <h1 id="stage-title">Bring it to life</h1>
-          </div>
-          <button class="new-button"
-               id="stage-back-button"
-               type="button"><span aria-hidden="true">←</span> Back to drawing</button>
-        </div>
-
-        <div class="stage-layout">
-          <div class="stage-scene-panel">
-            <div class="stage-scene"
-                 id="stage-scene"
-                 data-background="sunset"
-                 aria-live="polite">
-              <div class="stage-sky"
-                   aria-hidden="true"></div>
-              <div class="stage-ground"
-                   aria-hidden="true"></div>
-              <img id="stage-character"
-                   alt="Your created character" />
+            <div class="tray-section">
+              <h2>Pick a place</h2>
+              <div class="option-grid places" id="places" role="group" aria-label="Choose a place"></div>
             </div>
           </div>
 
-          <aside class="stage-sidebar"
-               aria-label="Background and motion choices">
-            <div class="stage-card">
-              <h2>Choose a background</h2>
-              <div class="background-picker"
-                   role="group"
-                   aria-label="Choose a background scene">
-                <button class="background-button is-selected"
-                     type="button"
-                     data-background="sunset"
-                     aria-pressed="true">Sunset</button>
-                <button class="background-button"
-                     type="button"
-                     data-background="meadow"
-                     aria-pressed="false">Meadow</button>
-                <button class="background-button"
-                     type="button"
-                     data-background="forest"
-                     aria-pressed="false">Forest</button>
-                <button class="background-button"
-                     type="button"
-                     data-background="beach"
-                     aria-pressed="false">Beach</button>
-                <button class="background-button"
-                     type="button"
-                     data-background="night"
-                     aria-pressed="false">Night sky</button>
-                <button class="background-button"
-                     type="button"
-                     data-background="city"
-                     aria-pressed="false">City</button>
-                <button class="background-button"
-                     type="button"
-                     data-background="castle"
-                     aria-pressed="false">Castle</button>
-                <button class="background-button"
-                     type="button"
-                     data-background="arctic"
-                     aria-pressed="false">Arctic</button>
+          <div class="panel" id="panel-dress" hidden>
+            <div class="tray-section">
+              <h2>Pick something to wear</h2>
+              <div class="chip-row" id="sticker-groups" role="group" aria-label="Kinds of stickers"></div>
+              <div class="sticker-grid" id="sticker-items"></div>
+            </div>
+          </div>
+
+          <form class="save-form" id="save-form" novalidate>
+            <label for="name">Name your character</label>
+            <input id="name" name="name" type="text" maxlength="24" autocomplete="off" placeholder="Like “Captain Noodle”" />
+            <button class="btn primary big" type="submit" id="save-button"><span aria-hidden="true">💾</span> <span id="save-label">Save my character</span></button>
+          </form>
+        </aside>
+      </div>
+    </section>
+
+    <!-- CHARACTERS -->
+    <section class="view characters" id="view-characters" data-title="My characters" hidden>
+      <div class="view-head">
+        <div>
+          <p class="pill pill-teal">Saved on this device</p>
+          <h1 tabindex="-1">My characters</h1>
+        </div>
+        <button class="btn primary" type="button" id="gallery-new"><span aria-hidden="true">＋</span> New drawing</button>
+      </div>
+      <ul class="gallery" id="gallery"></ul>
+      <div class="empty-card card" id="gallery-empty" hidden>
+        <div class="empty-emoji" aria-hidden="true">🎭</div>
+        <h2>No characters yet</h2>
+        <p>Your first friend is waiting to be drawn.</p>
+        <button class="btn primary big" type="button" id="empty-new"><span aria-hidden="true">✏️</span> Draw a character</button>
+      </div>
+    </section>
+
+    <!-- STORIES -->
+    <section class="view stories" id="view-stories" data-title="My stories" hidden>
+      <div class="view-head">
+        <div>
+          <p class="pill pill-sun">Saved on this device</p>
+          <h1 tabindex="-1">My stories</h1>
+        </div>
+        <button class="btn primary" type="button" id="story-new"><span aria-hidden="true">＋</span> New story</button>
+      </div>
+      <ul class="gallery" id="story-list"></ul>
+      <div class="empty-card card" id="stories-empty" hidden>
+        <div class="empty-emoji" aria-hidden="true">📖</div>
+        <h2>No stories yet</h2>
+        <p>Put your characters in scenes, add words, and watch it play like a movie.</p>
+        <button class="btn primary big" type="button" id="stories-empty-new"><span aria-hidden="true">✨</span> Make a story</button>
+      </div>
+    </section>
+
+    <!-- STORY BUILDER -->
+    <section class="view story-view" id="view-story" data-title="Build a story" hidden>
+      <div class="view-head">
+        <div>
+          <p class="pill pill-sun">Story builder</p>
+          <h1 tabindex="-1">Build your story</h1>
+        </div>
+        <div class="head-actions">
+          <button class="btn ghost" type="button" id="story-back"><span aria-hidden="true">←</span> My stories</button>
+          <button class="btn primary" type="button" id="story-watch"><span aria-hidden="true">▶</span> Watch it</button>
+        </div>
+      </div>
+
+      <div class="name-row">
+        <label for="story-name">Story name</label>
+        <input id="story-name" type="text" maxlength="30" autocomplete="off" placeholder="Like “The Big Picnic”" />
+        <p class="tip" id="story-status" role="status">Pick a character to begin</p>
+      </div>
+
+      <div class="story-layout">
+        <div class="story-main">
+          <div class="preview card">
+            <div class="preview-wrap">
+              <canvas id="story-canvas" width="640" height="480" tabindex="0" aria-label="Preview of the picked scene. If a pet or thing is picked, arrow keys move it and plus and minus resize it."></canvas>
+              <p class="preview-hint" id="story-canvas-hint">👇 Pick a character or add a pet for this scene</p>
+            </div>
+          </div>
+          <div class="caption-box">
+            <label for="caption"><span id="scene-label">Scene 1</span> words <span class="tip">(shown at the top of the scene)</span></label>
+            <textarea id="caption" rows="2" maxlength="100" placeholder="What is happening? Like “Bloop finds a magic hat!”"></textarea>
+            <p class="tip count" id="caption-count">0/100</p>
+          </div>
+        </div>
+
+        <aside class="controls card" aria-label="Scene controls">
+          <div class="tray-section">
+            <h2>Who is in this scene?</h2>
+            <div class="pick-grid" id="pick-chars" role="group" aria-label="Choose up to 2 characters"></div>
+            <p class="tip" id="pick-empty" hidden>You need a character first. <a href="#draw">Draw one!</a></p>
+          </div>
+          <div class="tray-section">
+            <h2>Add pets and things</h2>
+            <div class="chip-row" id="extra-groups" role="group" aria-label="Kinds of pets and things"></div>
+            <div class="sticker-grid" id="extra-items"></div>
+            <div class="extras-in-scene">
+              <h3>In this scene</h3>
+              <div class="chip-row" id="extras-list"></div>
+              <p class="tip" id="extras-none">Nothing yet. Tap one above!</p>
+            </div>
+            <div class="extra-tools" id="extra-tools" hidden>
+              <p class="tip" id="extra-picked" aria-live="polite"></p>
+              <div class="option-grid" id="extra-anims" role="group" aria-label="How the picked one moves"></div>
+              <div class="sticker-tools" role="group" aria-label="Change the picked pet or thing">
+                <button class="btn small ghost" type="button" id="extra-smaller"><span aria-hidden="true">➖</span> Smaller</button>
+                <button class="btn small ghost" type="button" id="extra-bigger"><span aria-hidden="true">➕</span> Bigger</button>
+                <button class="btn small danger" type="button" id="extra-remove"><span aria-hidden="true">🗑</span> Remove</button>
               </div>
             </div>
-
-            <div class="stage-card">
-              <h2>Choose a motion</h2>
-              <div class="motion-picker"
-                   role="group"
-                   aria-label="Choose a motion">
-                <button class="motion-button is-selected"
-                     type="button"
-                     data-motion="wiggle"
-                     aria-pressed="true">Wiggle</button>
-                <button class="motion-button"
-                     type="button"
-                     data-motion="bounce"
-                     aria-pressed="false">Bounce</button>
-                <button class="motion-button"
-                     type="button"
-                     data-motion="twirl"
-                     aria-pressed="false">Twirl</button>
-                <button class="motion-button"
-                     type="button"
-                     data-motion="glide"
-                     aria-pressed="false">Glide</button>
-              </div>
+          </div>
+          <div class="tray-section">
+            <h2>Where are they?</h2>
+            <div class="option-grid places" id="story-places" role="group" aria-label="Choose a place"></div>
+          </div>
+          <div class="tray-section">
+            <h2>What are they doing?</h2>
+            <div class="option-grid" id="story-motions" role="group" aria-label="Choose an action"></div>
+          </div>
+          <div class="tray-section">
+            <h2>Your voice</h2>
+            <div class="voice-row" id="voice-controls">
+              <button class="btn small ghost" type="button" id="voice-record">🎤 Record my voice</button>
+              <button class="btn small ghost" type="button" id="voice-listen" hidden>▶ Listen</button>
+              <button class="btn small danger" type="button" id="voice-remove" hidden>🗑 Remove voice</button>
             </div>
+            <p class="tip" id="voice-note"></p>
+            <p class="tip" id="voice-unsupported" hidden>This browser can't record voices. Your words still show in the story.</p>
+          </div>
+        </aside>
+      </div>
 
-            <button class="save-button create-button"
-                 id="create-character-button"
-                 type="button"><span aria-hidden="true">✦</span> Create character</button>
-          </aside>
+      <section class="scenes" aria-labelledby="scenes-title">
+        <div class="scenes-head">
+          <h2 id="scenes-title" class="section-title">Scenes</h2>
+          <p class="tip" id="scene-count">1 of 10 scenes</p>
+        </div>
+        <ol class="scene-strip" id="scene-strip"></ol>
+        <div class="scene-tools" role="group" aria-label="Change the picked scene">
+          <button class="btn small ghost" type="button" id="scene-earlier"><span aria-hidden="true">◀</span> Move earlier</button>
+          <button class="btn small ghost" type="button" id="scene-later">Move later <span aria-hidden="true">▶</span></button>
+          <button class="btn small ghost" type="button" id="scene-copy"><span aria-hidden="true">⧉</span> Copy scene</button>
+          <button class="btn small danger" type="button" id="scene-remove"><span aria-hidden="true">🗑</span> Remove scene</button>
+          <button class="btn small primary" type="button" id="scene-add"><span aria-hidden="true">＋</span> Add a scene</button>
         </div>
       </section>
+    </section>
 
-      <section class="view gallery-view is-hidden"
-           id="gallery-view"
-           aria-labelledby="gallery-title"
-           hidden>
-        <div class="page-heading gallery-heading">
-          <div>
-            <p class="eyebrow">YOUR CREATIVE CORNER <span aria-hidden="true">✦</span></p>
-            <h1 id="gallery-title">My characters</h1>
-          </div>
-          <button class="new-button"
-               id="gallery-new-character"
-               type="button"><span aria-hidden="true">+</span> New drawing</button>
+    <!-- WATCH -->
+    <section class="view watch" id="view-watch" data-title="Watch your story" hidden>
+      <div class="view-head">
+        <div>
+          <p class="pill pill-violet">Movie time</p>
+          <h1 tabindex="-1" id="watch-title">Your story</h1>
         </div>
-        <div class="gallery-grid"
-             id="gallery-grid"></div>
-        <div class="gallery-empty"
-             id="gallery-empty"
-             hidden>
-          <span aria-hidden="true">✎</span>
-          <h2>No characters yet</h2>
-          <p>Your next story starts with a drawing.</p>
-          <button class="save-button"
-               id="first-drawing"
-               type="button">Make your first character</button>
-        </div>
-        <button class="back-button"
-             id="back-to-studio"
-             type="button"><span aria-hidden="true">←</span> Back to drawing</button>
-      </section>
+        <button class="btn ghost" type="button" id="watch-back"><span aria-hidden="true">←</span> <span id="watch-back-label">My stories</span></button>
+      </div>
 
-      <section class="view videos-view is-hidden"
-           id="videos-view"
-           aria-labelledby="videos-title"
-           hidden>
-        <div class="page-heading gallery-heading">
-          <div>
-            <p class="eyebrow">YOUR CREATIVE CORNER <span aria-hidden="true">✦</span></p>
-            <h1 id="videos-title">My videos</h1>
-          </div>
-          <span class="local-label"><span aria-hidden="true">●</span> Saved in this game</span>
+      <div class="player card">
+        <div class="player-wrap">
+          <canvas id="player-canvas" role="img" aria-label="Your story playing"></canvas>
+          <p class="player-badge" id="player-badge" hidden>● Saving</p>
+          <button class="player-overlay" type="button" id="player-overlay" hidden>▶ Play</button>
         </div>
-        <div class="videos-empty"
-             id="videos-empty">
-          <div class="empty-film"
-               aria-hidden="true"><span>▶</span><i></i><i></i><i></i></div>
-          <p class="eyebrow">YOUR STORY SHELF</p>
-          <h2>Your adventures will live here</h2>
-          <p>When you finish a story, you can watch it here or open it to keep editing. Videos play only inside Little Story Studio.</p>
-          <button class="start-button"
-               id="videos-start-game"
-               type="button"><span aria-hidden="true">✦</span> Start a new game</button>
+        <div class="progress" aria-hidden="true"><i id="progress-fill"></i></div>
+        <div class="player-bar">
+          <button class="btn primary" type="button" id="pp-toggle" disabled>Getting ready…</button>
+          <button class="btn ghost" type="button" id="pp-restart" hidden><span aria-hidden="true">⏮</span> Start over</button>
+          <button class="btn ghost" type="button" id="pp-save" hidden><span aria-hidden="true">🎥</span> Save to My videos</button>
+          <button class="btn ghost" type="button" id="pp-videos" hidden><span aria-hidden="true">🎬</span> Go to My videos</button>
         </div>
-        <div class="video-grid"
-             id="video-grid"
-             hidden></div>
-        <button class="back-button"
-             id="videos-home"
-             type="button"><span aria-hidden="true">←</span> Back to home</button>
-      </section>
-    </main>
-  </div>
+        <p class="tip" id="pp-note"></p>
+      </div>
+    </section>
 
-  <dialog class="save-dialog"
-       id="save-dialog"
-       aria-labelledby="dialog-title">
-    <form method="dialog"
-         id="save-form">
-      <p class="eyebrow">A NEW FRIEND <span aria-hidden="true">✦</span></p>
-      <h2 id="dialog-title">Name your character</h2>
-      <label for="character-name">Character name</label>
-      <input id="character-name"
-           name="character-name"
-           type="text"
-           maxlength="24"
-           value="My character"
-           autocomplete="off"
-           required />
+    <!-- VIDEOS -->
+    <section class="view videos" id="view-videos" data-title="My videos" hidden>
+      <div class="view-head">
+        <div>
+          <p class="pill pill-teal">Saved in this game</p>
+          <h1 tabindex="-1">My videos</h1>
+        </div>
+      </div>
+      <ul class="gallery" id="video-list"></ul>
+      <p class="tip storage-note" id="video-storage" hidden></p>
+      <div class="empty-card card" id="videos-empty" hidden>
+        <div class="film" aria-hidden="true"><i></i><i></i><i></i><span>▶</span><i></i><i></i><i></i></div>
+        <h2>Your movies will live here</h2>
+        <p>Watch one of your stories, then choose “Save to My videos”. Movies stay inside Little Story Studio, on this device.</p>
+        <a class="btn primary big" href="#stories"><span aria-hidden="true">📖</span> Go to my stories</a>
+      </div>
+    </section>
+
+  </main>
+
+  <dialog class="dialog" id="confirm" aria-labelledby="confirm-title">
+    <form method="dialog">
+      <div class="dialog-emoji" id="confirm-emoji" aria-hidden="true">🤔</div>
+      <h2 id="confirm-title">Are you sure?</h2>
+      <p id="confirm-text"></p>
       <div class="dialog-actions">
-        <button class="cancel-button"
-             id="cancel-save"
-             type="button">Keep drawing</button>
-        <button class="save-button"
-             id="confirm-save"
-             type="submit">Save friend</button>
+        <button class="btn ghost" value="cancel" id="confirm-cancel">Keep it</button>
+        <button class="btn danger" value="ok" id="confirm-ok">Do it</button>
       </div>
     </form>
   </dialog>
-  <div class="toast"
-       id="toast"
-       role="status"
-       aria-live="polite"></div>
-</body>
 
+  <dialog class="dialog wide" id="video-dialog" aria-labelledby="video-title">
+    <h2 id="video-title">Your movie</h2>
+    <video id="video-el" controls playsinline controlslist="nodownload noremoteplayback" disablepictureinpicture></video>
+    <div class="dialog-actions">
+      <button class="btn primary" type="button" id="video-close">Close</button>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
 </html>

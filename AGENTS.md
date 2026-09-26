@@ -21,33 +21,34 @@ Saved characters and finished videos belong to the current browser on the curren
 
 ### Phase 2: Bring It to Life
 
-- Add a character preview stage and a small set of playful motion presets.
-- Keep animation simple and usable without requiring kids to rig body parts.
-- Save the selected motion with the character/story data.
+- [x] Add a character preview stage and a small set of playful motion presets.
+- [x] Keep animation simple and usable without requiring kids to rig body parts.
+- [x] Save the selected motion with the character/story data.
 
 ### Phase 3: Dress the Character
 
-- Add draggable costume and prop stickers.
-- Let kids remove, move, and resize stickers with touch.
-- Preserve the original drawing so outfits can be changed.
+- [x] Add draggable costume and prop stickers.
+- [x] Let kids remove, move, and resize stickers with touch.
+- [x] Preserve the original drawing so outfits can be changed.
 
 ### Phase 4: Build a Story
 
-- Create a short, ordered sequence of scenes with backgrounds, characters, and simple actions.
-- Support captions and optional narration.
-- Make the scene sequence easy to rearrange and preview.
+- [x] Create a short, ordered sequence of scenes with backgrounds, characters, and simple actions.
+- [x] Support captions and optional narration (the child's own recorded voice).
+- [x] Make the scene sequence easy to rearrange and preview.
+- [x] Add animated pets and objects to scenes (drag to place, resize, pick an animation), more places, and up to 20 scenes per story.
 
 ### Phase 5: My Videos
 
-- Play a finished story and save it to an in-game video collection.
-- Replay and delete saved videos only inside the game.
-- Do not provide video export or sharing.
-- Check browser recording support and local storage limits; keep story playback available if recording is unsupported.
+- [x] Play a finished story and save it to an in-game video collection.
+- [x] Replay and delete saved videos only inside the game.
+- [x] Do not provide video export or sharing.
+- [x] Check browser recording support and local storage limits; keep story playback available if recording is unsupported.
 
 ## Project Conventions
 
 - Keep the first version dependency-free: static HTML, CSS, and JavaScript.
-- Put app code under `src/`; keep `index.html` at the project root.
+- Put app code under `src/`; keep `index.html` at the project root. Plain scripts share one `window.LSS` object and load in the order listed in `index.html`: `data`, `db`, `ui`, `scene`, then one file per screen (`draw`, `dress`, `gallery`, `story`, `play`, `videos`), then `app`.
 - Use browser-native APIs and pointer events for mouse, stylus, and touch input.
 - Store larger local assets in IndexedDB, not `localStorage`.
 - Keep controls readable, large, and direct for early readers; use words as well as icons.
