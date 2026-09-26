@@ -334,7 +334,7 @@
     ctx.clearRect(0, 0, W, H);
 
     try {
-      const wanted = new Set(story.scenes.flatMap((scene) => scene.cast));
+      const wanted = new Set(story.scenes.flatMap((scene) => scene.cast.map((entry) => entry.id)));
       arts = await painter.loadArts((await db.all("characters")).filter((character) => wanted.has(character.id)));
     } catch (error) {
       console.error("Could not load characters", error);
